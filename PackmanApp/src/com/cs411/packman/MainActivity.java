@@ -127,33 +127,36 @@ public class MainActivity extends FragmentActivity {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
 			
-			ListView listview = (ListView) rootView.findViewById(R.id.allPackages);
+			int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
 			
-			ArrayList<String> list = new ArrayList<String>();  
-		      
-		    // Create ArrayAdapter using the planet list.  
-		    listAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.simplerow, list);  
-		      
-			AsyncTask<String, String, String> response = new RequestTask().execute("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getPackages");
-			
-			try {
-				String responseString = response.get().replace("\n", "");
-				//JSONObject jsonObject = new JSONObject(JSONObject.quote(responseString));
-				JSONArray jsonArray = new JSONArray(responseString);
+			if (sectionNumber == 1) {
+				ListView listview = (ListView) rootView.findViewById(R.id.allPackages);
 				
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObject obj = jsonArray.getJSONObject(i);
-					listAdapter.add(obj.get("carrier") + ": " + obj.get("pkgid") + ": " + obj.get("desc"));
+				ArrayList<String> list = new ArrayList<String>();  
+			      
+			    // Create ArrayAdapter using the planet list.  
+			    listAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.simplerow, list);  
+			      
+				AsyncTask<String, String, String> response = new RequestTask().execute("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getPackages");
+				
+				try {
+					String responseString = response.get().replace("\n", "");
+					//JSONObject jsonObject = new JSONObject(JSONObject.quote(responseString));
+					JSONArray jsonArray = new JSONArray(responseString);
+					
+					for (int i = 0; i < jsonArray.length(); i++) {
+						JSONObject obj = jsonArray.getJSONObject(i);
+						listAdapter.add(obj.get("carrier") + ": " + obj.get("pkgid") + ": " + obj.get("desc"));
+					}
+					
+					// Set the ArrayAdapter as the ListView's adapter.  
+				    listview.setAdapter( listAdapter );  
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
 				}
-				
-				// Set the ArrayAdapter as the ListView's adapter.  
-			    listview.setAdapter( listAdapter );  
-				
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
-			
 			return rootView;
 		}
 	}
