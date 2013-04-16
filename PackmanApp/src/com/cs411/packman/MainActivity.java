@@ -1,19 +1,10 @@
 package com.cs411.packman;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import java.util.Locale;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONObject;
+import org.json.JSONArray;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +17,8 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.packman.R;
@@ -46,6 +39,7 @@ public class MainActivity extends FragmentActivity {
 	 * The {@link ViewPager} that will host the section contents.
 	 */
 	ViewPager mViewPager;
+	ListView mPackageListView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -60,17 +54,6 @@ public class MainActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
-		AsyncTask<String, String, String> response = new RequestTask().execute("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getPackages&pm_session_id=aa17f95c749e7938b0cc0c776082822a");
-		
-		try {
-			JSONObject jsonObject = new JSONObject(response.get());
-			
-			int i = 1;
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 	}
 
 	@Override
@@ -133,6 +116,8 @@ public class MainActivity extends FragmentActivity {
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
+		
+		private ArrayAdapter<String> listAdapter ;  
 
 		public DummySectionFragment() {
 		}
@@ -142,10 +127,33 @@ public class MainActivity extends FragmentActivity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
-			TextView dummyTextView = (TextView) rootView
-					.findViewById(R.id.section_label);
-			dummyTextView.setText(Integer.toString(getArguments().getInt(
-					ARG_SECTION_NUMBER)));
+			
+			ListView listview = (ListView) rootView.findViewById(R.id.allPackages);
+			
+			ArrayList<String> list = new ArrayList<String>();  
+		      
+		    // Create ArrayAdapter using the planet list.  
+		    listAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.simplerow, list);  
+		      
+			AsyncTask<String, String, String> response = new RequestTask().execute("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getPackages");
+			
+			try {
+				String responseString = response.get().replace("\n", "");
+				//JSONObject jsonObject = new JSONObject(JSONObject.quote(responseString));
+				JSONArray jsonArray = new JSONArray(responseString);
+				
+				for (int i = 0; i < jsonArray.length(); i++) {
+					listAdapter.add(jsonArray.getJSONObject(i).get("carrier") + ": " + jsonArray.getJSONObject(i).get("pkgid"));
+				}
+				
+				// Set the ArrayAdapter as the ListView's adapter.  
+			    listview.setAdapter( listAdapter );  
+				
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
 			return rootView;
 		}
 	}
