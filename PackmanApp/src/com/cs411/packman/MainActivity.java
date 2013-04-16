@@ -1,10 +1,10 @@
 package com.cs411.packman;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Locale;
 
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +19,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.example.packman.R;
 
@@ -143,7 +142,8 @@ public class MainActivity extends FragmentActivity {
 				JSONArray jsonArray = new JSONArray(responseString);
 				
 				for (int i = 0; i < jsonArray.length(); i++) {
-					listAdapter.add(jsonArray.getJSONObject(i).get("carrier") + ": " + jsonArray.getJSONObject(i).get("pkgid"));
+					JSONObject obj = jsonArray.getJSONObject(i);
+					listAdapter.add(obj.get("carrier") + ": " + obj.get("pkgid") + ": " + obj.get("desc"));
 				}
 				
 				// Set the ArrayAdapter as the ListView's adapter.  
