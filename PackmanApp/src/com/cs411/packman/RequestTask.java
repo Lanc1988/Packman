@@ -29,7 +29,7 @@ class RequestTask extends AsyncTask<String, String, String>{
         String responseString = null;
         String sessionID = null;
         try {
-            response = httpclient.execute(new HttpGet("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getSessionID&username=nmshah3&password=ns"));
+            response = httpclient.execute(new HttpGet("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getSessionID&username=" + MainActivity.getUserName() + "&password=" + MainActivity.getPassword()));
             StatusLine statusLine = response.getStatusLine();
             if(statusLine.getStatusCode() == HttpStatus.SC_OK){
                 ByteArrayOutputStream out = new ByteArrayOutputStream();

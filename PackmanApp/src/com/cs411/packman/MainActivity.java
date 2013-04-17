@@ -8,6 +8,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment; 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -39,6 +40,9 @@ public class MainActivity extends FragmentActivity {
 	 */
 	ViewPager mViewPager;
 	ListView mPackageListView;
+	
+	private static String username = null;
+	private static String password = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +57,22 @@ public class MainActivity extends FragmentActivity {
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+	}
+	
+	public static String getUserName() {
+		return username;
+	}
+	
+	public static String getPassword() {
+		return password;
+	}
+	
+	public static void setUserName(String un) {
+		username = un;
+	}
+	
+	public static void setPassword(String pw) {
+		password = pw;
 	}
 
 	@Override
@@ -129,8 +149,14 @@ public class MainActivity extends FragmentActivity {
 			
 			int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
 			
-			if (sectionNumber == 1) {
-				ListView listview = (ListView) rootView.findViewById(R.id.allPackages);
+			if (MainActivity.getUserName() == null) {
+				DialogFragment dialog = new LoginDialogFragment();
+				
+		        dialog.show(getFragmentManager(), "LoginDialogFragment");
+				
+			} else {
+				ListView listView = (ListView) rootView.findViewById(R.id.allPackages);
+				listView.setVisibility(View.VISIBLE);
 				
 				ArrayList<String> list = new ArrayList<String>();  
 			      
@@ -150,7 +176,7 @@ public class MainActivity extends FragmentActivity {
 					}
 					
 					// Set the ArrayAdapter as the ListView's adapter.  
-				    listview.setAdapter( listAdapter );  
+				    listView.setAdapter( listAdapter );  
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

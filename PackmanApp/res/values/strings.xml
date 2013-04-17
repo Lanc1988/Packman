@@ -6,5 +6,10 @@
     <string name="title_section1">View All Packages</string>
     <string name="title_section2">Add Package</string>
     <string name="title_section3">Remove Package</string>
+    <string name="login">Login</string>
+    <string name="cancel">Cancel</string>
+    <string name="username">Username</string>
+    <string name="password">Password</string>
+    <string name="login_message">Please Login</string>
 
 </resources>
