@@ -1,11 +1,11 @@
 package com.cs411.packman;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.widget.EditText;
 
@@ -34,6 +34,10 @@ public class LoginDialogFragment extends DialogFragment {
 	                   MainActivity.setPassword(password.getText().toString());
 	                   
 	                   LoginDialogFragment.this.getDialog().cancel();
+	                   
+	                   ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.pager);
+	                   viewPager.forceLayout();
+	                   viewPager.invalidate();
 	               }
 	           })
 	           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
