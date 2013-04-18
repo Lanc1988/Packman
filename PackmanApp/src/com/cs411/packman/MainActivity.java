@@ -6,6 +6,7 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -21,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.cs411.packman.LoginDialogFragment.LoginDialogListener;
 import com.example.packman.R;
@@ -91,6 +93,8 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
         
         ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
         viewPager.getAdapter().notifyDataSetChanged();
+        
+        showToast(R.string.login_successful);
     }
 
 	@Override
@@ -107,13 +111,22 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 	        case R.id.action_logout:
 	        	MainActivity.setUserName(null);
 	        	MainActivity.setPassword(null);
+	        	showToast(R.string.logout_successful);
 	        case R.id.action_refresh:
 	        	ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
 	            viewPager.getAdapter().notifyDataSetChanged();
+	            showToast(R.string.data_refresh);
 	            return true;
 	        default:
 	            return super.onOptionsItemSelected(item);
 	    }
+	}
+	
+	private void showToast(int text) {
+		Context context = getApplicationContext();
+		int duration = Toast.LENGTH_SHORT;
+		Toast toast = Toast.makeText(context, text, duration);
+		toast.show();
 	}
 
 	/**

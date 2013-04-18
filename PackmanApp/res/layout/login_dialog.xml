@@ -10,7 +10,7 @@
         android:background="#333333"
         android:contentDescription="@string/app_name" />
     <TextView
-        android:text="@string/login_message"
+        android:text="@string/app_name"
         android:layout_width="match_parent"
         android:gravity="center"
         android:background="#333333"
