@@ -83,4 +83,8 @@ class RequestTask extends AsyncTask<String, String, String>{
 		String responseString = response.get().replace("\n", "");
 		return new JSONArray(responseString);
     }
+    
+    public void removePackage(String id) throws Exception {
+    	execute(URL + REQUEST_SERVLET + "?requestName=removePackage&tracking_number=" + id);
+    }
 }
