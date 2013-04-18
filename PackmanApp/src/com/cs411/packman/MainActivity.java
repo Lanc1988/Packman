@@ -3,9 +3,6 @@ package com.cs411.packman;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -203,22 +200,9 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 				ListView listView = (ListView) rootView.findViewById(R.id.allPackages);
 				listView.setVisibility(View.VISIBLE);
 				
-				ArrayList<String> list = new ArrayList<String>();  
-			      
-			    // Create ArrayAdapter using the planet list.  
-			    listAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.simplerow, list);  
-			      
 				try {
-					JSONArray jsonArray = new RequestTask().getPackages();;
-					
-					for (int i = 0; i < jsonArray.length(); i++) {
-						JSONObject obj = jsonArray.getJSONObject(i);
-						listAdapter.add(obj.get("carrier") + ": " + obj.get("pkgid") + ": " + obj.get("desc"));
-					}
-					
 					// Set the ArrayAdapter as the ListView's adapter.  
-				    listView.setAdapter( listAdapter );  
-					
+				    listView.setAdapter(new PackageListAdapter(getActivity(), new RequestTask().getPackages()));  
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
