@@ -93,11 +93,6 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
         viewPager.getAdapter().notifyDataSetChanged();
     }
 
-    @Override
-    public void onDialogNegativeClick(DialogFragment dialog) {
-        // User touched the dialog's negative button
-    }
-
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
