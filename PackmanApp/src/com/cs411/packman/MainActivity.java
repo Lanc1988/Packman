@@ -8,7 +8,7 @@ import org.json.JSONObject;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment; 
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -19,11 +19,13 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ListView;
 
+import com.cs411.packman.LoginDialogFragment.LoginDialogListener;
 import com.example.packman.R;
 
-public class MainActivity extends FragmentActivity {
+public class MainActivity extends FragmentActivity implements LoginDialogListener {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -74,6 +76,27 @@ public class MainActivity extends FragmentActivity {
 	public static void setPassword(String pw) {
 		password = pw;
 	}
+	
+    @Override
+    public void loginUser(DialogFragment dialog) {
+        // sign in the user ...
+ 	   // User touched the dialog's positive button
+        EditText username = (EditText) dialog.getDialog().findViewById(R.id.username);
+        EditText password = (EditText) dialog.getDialog().findViewById(R.id.password);
+        
+        MainActivity.setUserName(username.getText().toString());
+        MainActivity.setPassword(password.getText().toString());
+        
+        dialog.getDialog().cancel();
+        
+        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+        viewPager.getAdapter().notifyDataSetChanged();
+    }
+
+    @Override
+    public void onDialogNegativeClick(DialogFragment dialog) {
+        // User touched the dialog's negative button
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -91,23 +114,27 @@ public class MainActivity extends FragmentActivity {
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
+		
+		@Override
+		public int getItemPosition(Object object) {
+		    return POSITION_NONE;
+		}
 
 		@Override
 		public Fragment getItem(int position) {
 			// getItem is called to instantiate the fragment for the given page.
 			// Return a DummySectionFragment (defined as a static inner class
 			// below) with the page number as its lone argument.
-			Fragment fragment = new DummySectionFragment();
+			Fragment fragment = new SectionFragment();
 			Bundle args = new Bundle();
-			args.putInt(DummySectionFragment.ARG_SECTION_NUMBER, position + 1);
+			args.putInt(SectionFragment.ARG_SECTION_NUMBER, position + 1);
 			fragment.setArguments(args);
 			return fragment;
 		}
 
 		@Override
 		public int getCount() {
-			// Show 3 total pages.
-			return 3;
+			return 1;
 		}
 
 		@Override
@@ -115,11 +142,7 @@ public class MainActivity extends FragmentActivity {
 			Locale l = Locale.getDefault();
 			switch (position) {
 			case 0:
-				return getString(R.string.title_section1).toUpperCase(l);
-			case 1:
-				return getString(R.string.title_section2).toUpperCase(l);
-			case 2:
-				return getString(R.string.title_section3).toUpperCase(l);
+				return getString(R.string.section_title).toUpperCase(l);
 			}
 			return null;
 		}
@@ -129,16 +152,16 @@ public class MainActivity extends FragmentActivity {
 	 * A dummy fragment representing a section of the app, but that simply
 	 * displays dummy text.
 	 */
-	public static class DummySectionFragment extends Fragment {
+	public static class SectionFragment extends Fragment {
 		/**
 		 * The fragment argument representing the section number for this
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 		
-		private ArrayAdapter<String> listAdapter ;  
+		private ArrayAdapter<String> listAdapter;  
 
-		public DummySectionFragment() {
+		public SectionFragment() {
 		}
 
 		@Override
@@ -146,8 +169,6 @@ public class MainActivity extends FragmentActivity {
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
-			
-			int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
 			
 			if (MainActivity.getUserName() == null) {
 				DialogFragment dialog = new LoginDialogFragment();
