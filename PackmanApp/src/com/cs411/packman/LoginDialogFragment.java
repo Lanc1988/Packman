@@ -23,16 +23,12 @@ public class LoginDialogFragment extends DialogFragment {
 	    // Pass null as the parent view because its going in the dialog layout
 	    builder.setView(inflater.inflate(R.layout.login_dialog, null))
 	    // Add action buttons
+	    	   .setCancelable(false)
 	           .setPositiveButton(R.string.login, new DialogInterface.OnClickListener() {
 	               @Override
 	               public void onClick(DialogInterface dialog, int id) {
 	            	// Send the positive button event back to the host activity
                        mListener.loginUser(LoginDialogFragment.this);
-	               }
-	           })
-	           .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-	               public void onClick(DialogInterface dialog, int id) {
-	                   LoginDialogFragment.this.getDialog().cancel();
 	               }
 	           });      
 	    return builder.create();
