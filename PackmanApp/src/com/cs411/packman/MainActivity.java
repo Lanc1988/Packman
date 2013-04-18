@@ -6,7 +6,6 @@ import java.util.Locale;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -16,6 +15,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -99,6 +99,22 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+	    // Handle item selection
+	    switch (item.getItemId()) {
+	        case R.id.action_logout:
+	        	MainActivity.setUserName(null);
+	        	MainActivity.setPassword(null);
+	        case R.id.action_refresh:
+	        	ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+	            viewPager.getAdapter().notifyDataSetChanged();
+	            return true;
+	        default:
+	            return super.onOptionsItemSelected(item);
+	    }
+	}
 
 	/**
 	 * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -179,12 +195,8 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 			    // Create ArrayAdapter using the planet list.  
 			    listAdapter = new ArrayAdapter<String>(getActivity().getApplicationContext(), R.layout.simplerow, list);  
 			      
-				AsyncTask<String, String, String> response = new RequestTask().execute("http://teambazinga.web.engr.illinois.edu/php/request.php?requestName=getPackages");
-				
 				try {
-					String responseString = response.get().replace("\n", "");
-					//JSONObject jsonObject = new JSONObject(JSONObject.quote(responseString));
-					JSONArray jsonArray = new JSONArray(responseString);
+					JSONArray jsonArray = new RequestTask().getPackages();;
 					
 					for (int i = 0; i < jsonArray.length(); i++) {
 						JSONObject obj = jsonArray.getJSONObject(i);
