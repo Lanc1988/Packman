@@ -30,8 +30,6 @@
   	</intent-filter>
 	</receiver>
 	
-	<service android:name=".GCMIntentService" />
-
     <application
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
@@ -46,6 +44,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <service android:name="com.cs411.packman.GetPackagesService"></service>
+        <service android:name=".GCMIntentService" />
     </application>
 
 </manifest>

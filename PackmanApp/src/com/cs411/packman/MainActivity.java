@@ -1,9 +1,9 @@
 package com.cs411.packman;
 
-import java.util.ArrayList;
 import java.util.Locale;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -42,6 +42,8 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 	ViewPager mViewPager;
 	ListView mPackageListView;
 	
+	Intent serviceIntent;
+	
 	private static String username = null;
 	private static String password = null;
 
@@ -60,6 +62,20 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		mViewPager.setAdapter(mSectionsPagerAdapter);
 	}
 	
+	@Override
+	protected void onPause() {
+		super.onPause();
+		
+		stopService(serviceIntent);
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		serviceIntent = new Intent(MainActivity.this, GetPackagesService.class);
+        startService(serviceIntent);
+	}
 	public static String getUserName() {
 		return username;
 	}
