@@ -27,9 +27,10 @@ public class PullPackagesDataService extends Service {
 
     @Override
     public void onDestroy() {
+    	if (background != null) {
+    		background.interrupt();
+    	}
         Toast.makeText(this, R.string.polling_disabled, Toast.LENGTH_SHORT).show();
-        //background.stop();
-        //background.destroy();
     }
 
     @Override
@@ -46,6 +47,7 @@ public class PullPackagesDataService extends Service {
 				try {
 					newItems = new RequestTask().getPackages();
 					
+					// Serialize the items and then compare if the items have changed.
 					boolean haveItemsChanged = currentItems == null ? true
 							: !newItems.toString().equals(currentItems.toString());
 

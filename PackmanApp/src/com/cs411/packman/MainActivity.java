@@ -78,8 +78,21 @@ public class MainActivity extends FragmentActivity implements
 
 	@Override
 	protected void onPause() {
-		stopService(serviceIntent);
+		if (serviceIntent != null) {
+			stopService(serviceIntent);
+		}
 		super.onPause();
+	}
+	
+	@Override
+	protected void onResume() {
+		if (username != null) {
+			Messenger messenger = new Messenger(progressHandler);
+			serviceIntent = new Intent(MainActivity.this, PullPackagesDataService.class);
+			serviceIntent.putExtra("messenger", messenger);
+			startService(serviceIntent);
+		}
+		super.onResume();
 	}
 
 	public static String getUserName() {
