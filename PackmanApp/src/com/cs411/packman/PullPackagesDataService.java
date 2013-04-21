@@ -28,8 +28,8 @@ public class PullPackagesDataService extends Service {
     @Override
     public void onDestroy() {
         Toast.makeText(this, R.string.polling_disabled, Toast.LENGTH_SHORT).show();
-        background.stop();
-        background.destroy();
+        //background.stop();
+        //background.destroy();
     }
 
     @Override
@@ -55,6 +55,9 @@ public class PullPackagesDataService extends Service {
 						currentItems = newItems;
 						messenger.send(msg);
 					}
+					
+					// Re run the thread every 10 seconds
+					Thread.sleep(10000);
 					run();
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
