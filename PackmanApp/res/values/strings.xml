@@ -9,7 +9,6 @@
     <string name="username">Username</string>
     <string name="password">Password</string>
     <string name="logout_successful">Logout Successful!</string>
-    <string name="data_refresh">Data refrshed!</string>
+    <string name="data_refresh">Data refreshed!</string>
     <string name="login_successful">Login Successful!</string>
-    
 </resources>

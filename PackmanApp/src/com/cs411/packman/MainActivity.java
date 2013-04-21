@@ -2,9 +2,13 @@ package com.cs411.packman;
 
 import java.util.Locale;
 
+import org.json.JSONArray;
+
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.SystemClock;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -41,8 +45,9 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 	 */
 	ViewPager mViewPager;
 	ListView mPackageListView;
-	
-	Intent serviceIntent;
+	Handler progressHandler;
+	Thread background;
+	JSONArray currentItems;
 	
 	private static String username = null;
 	private static String password = null;
@@ -60,22 +65,47 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
+		
+		// Create a progress handler to handle background tasks.
+		progressHandler = new Handler() {
+		    public void handleMessage(Message msg) {
+		    	try {
+		    		JSONArray newItems = new RequestTask().getPackages();
+		    		
+		    		boolean haveItemsChanged = currentItems == null ? true : !newItems.toString().equals(currentItems.toString());
+		    		
+		    		if (haveItemsChanged) {
+		    			currentItems = newItems;
+				    	ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+			            viewPager.getAdapter().notifyDataSetChanged();
+			            showToast(R.string.data_refresh);
+		    		}
+		            background.run();
+		    	} catch (Exception ex) {}
+		    }
+		};
+		
+		// Create a background thread that we'll start onResume and stop onPause
+		background = new Thread (new Runnable() {
+		    @Override
+		    public void run() {
+				progressHandler.sendMessage(progressHandler.obtainMessage());
+		    }
+		});
 	}
 	
 	@Override
-	protected void onPause() {
+	public void onPause() {
+		background.destroy();
+		SystemClock.sleep(5000);
 		super.onPause();
-		
-		stopService(serviceIntent);
 	}
 	
 	@Override
-	protected void onResume() {
+	public void onResume() {
 		super.onResume();
-		
-		serviceIntent = new Intent(MainActivity.this, GetPackagesService.class);
-        startService(serviceIntent);
 	}
+	
 	public static String getUserName() {
 		return username;
 	}
@@ -108,6 +138,9 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
         viewPager.getAdapter().notifyDataSetChanged();
         
         showToast(R.string.login_successful);
+        
+        // Start the background activity;
+        background.start();
     }
 
 	@Override
@@ -197,7 +230,7 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		public static final String ARG_SECTION_NUMBER = "section_number";
 		
 		private ArrayAdapter<String> listAdapter;  
-
+		
 		public SectionFragment() {
 		}
 
