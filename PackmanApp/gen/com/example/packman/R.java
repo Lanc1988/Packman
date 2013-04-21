@@ -57,6 +57,7 @@ public final class R {
         public static final int login=0x7f050004;
         public static final int login_successful=0x7f05000a;
         public static final int logout_successful=0x7f050008;
+        public static final int notification=0x7f05000b;
         public static final int password=0x7f050007;
         public static final int section_title=0x7f050003;
         public static final int username=0x7f050006;

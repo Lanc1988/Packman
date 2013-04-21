@@ -2,13 +2,12 @@ package com.cs411.packman;
 
 import java.util.Locale;
 
-import org.json.JSONArray;
-
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.SystemClock;
+import android.os.Messenger;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -28,7 +27,8 @@ import android.widget.Toast;
 import com.cs411.packman.LoginDialogFragment.LoginDialogListener;
 import com.example.packman.R;
 
-public class MainActivity extends FragmentActivity implements LoginDialogListener {
+public class MainActivity extends FragmentActivity implements
+		LoginDialogListener {
 
 	/**
 	 * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -46,9 +46,8 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 	ViewPager mViewPager;
 	ListView mPackageListView;
 	Handler progressHandler;
-	Thread background;
-	JSONArray currentItems;
-	
+	Intent serviceIntent;
+
 	private static String username = null;
 	private static String password = null;
 
@@ -65,83 +64,73 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		// Set up the ViewPager with the sections adapter.
 		mViewPager = (ViewPager) findViewById(R.id.pager);
 		mViewPager.setAdapter(mSectionsPagerAdapter);
-		
+
 		// Create a progress handler to handle background tasks.
 		progressHandler = new Handler() {
-		    public void handleMessage(Message msg) {
-		    	try {
-		    		JSONArray newItems = new RequestTask().getPackages();
-		    		
-		    		boolean haveItemsChanged = currentItems == null ? true : !newItems.toString().equals(currentItems.toString());
-		    		
-		    		if (haveItemsChanged) {
-		    			currentItems = newItems;
-				    	ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-			            viewPager.getAdapter().notifyDataSetChanged();
-			            showToast(R.string.data_refresh);
-		    		}
-		            background.run();
-		    	} catch (Exception ex) {}
-		    }
+			public void handleMessage(Message msg) {
+				if (msg.arg1 == 1) {
+					ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+					viewPager.getAdapter().notifyDataSetChanged();
+					showToast(R.string.data_refresh);
+				}
+			}
 		};
-		
-		// Create a background thread that we'll start onResume and stop onPause
-		background = new Thread (new Runnable() {
-		    @Override
-		    public void run() {
-				progressHandler.sendMessage(progressHandler.obtainMessage());
-		    }
-		});
 	}
-	
+
 	@Override
-	public void onPause() {
-		background.destroy();
-		SystemClock.sleep(5000);
+	protected void onPause() {
+		stopService(serviceIntent);
 		super.onPause();
 	}
-	
+
 	@Override
-	public void onResume() {
+	protected void onResume() {
 		super.onResume();
 	}
-	
+
 	public static String getUserName() {
 		return username;
 	}
-	
+
 	public static String getPassword() {
 		return password;
 	}
-	
+
 	public static void setUserName(String un) {
 		username = un;
 	}
-	
+
 	public static void setPassword(String pw) {
 		password = pw;
 	}
-	
-    @Override
-    public void loginUser(DialogFragment dialog) {
-        // sign in the user ...
- 	   // User touched the dialog's positive button
-        EditText username = (EditText) dialog.getDialog().findViewById(R.id.username);
-        EditText password = (EditText) dialog.getDialog().findViewById(R.id.password);
-        
-        MainActivity.setUserName(username.getText().toString());
-        MainActivity.setPassword(password.getText().toString());
-        
-        dialog.getDialog().cancel();
-        
-        ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-        viewPager.getAdapter().notifyDataSetChanged();
-        
-        showToast(R.string.login_successful);
-        
-        // Start the background activity;
-        background.start();
-    }
+
+	@Override
+	public void loginUser(DialogFragment dialog) {
+		// sign in the user ...
+		// User touched the dialog's positive button
+		EditText username = (EditText) dialog.getDialog().findViewById(
+				R.id.username);
+		EditText password = (EditText) dialog.getDialog().findViewById(
+				R.id.password);
+
+		MainActivity.setUserName(username.getText().toString());
+		MainActivity.setPassword(password.getText().toString());
+
+		dialog.getDialog().cancel();
+
+		ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+		viewPager.getAdapter().notifyDataSetChanged();
+
+		showToast(R.string.login_successful);
+
+		// Start the background activity;
+//		background.start();
+		
+		Messenger messenger = new Messenger(progressHandler);
+		serviceIntent = new Intent(MainActivity.this, PullPackagesDataService.class);
+		serviceIntent.putExtra("messenger", messenger);
+		startService(serviceIntent);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -149,25 +138,25 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-	    // Handle item selection
-	    switch (item.getItemId()) {
-	        case R.id.action_logout:
-	        	MainActivity.setUserName(null);
-	        	MainActivity.setPassword(null);
-	        	showToast(R.string.logout_successful);
-	        case R.id.action_refresh:
-	        	ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
-	            viewPager.getAdapter().notifyDataSetChanged();
-	            showToast(R.string.data_refresh);
-	            return true;
-	        default:
-	            return super.onOptionsItemSelected(item);
-	    }
+		// Handle item selection
+		switch (item.getItemId()) {
+		case R.id.action_logout:
+			MainActivity.setUserName(null);
+			MainActivity.setPassword(null);
+			showToast(R.string.logout_successful);
+		case R.id.action_refresh:
+			ViewPager viewPager = (ViewPager) findViewById(R.id.pager);
+			viewPager.getAdapter().notifyDataSetChanged();
+			showToast(R.string.data_refresh);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
-	
+
 	private void showToast(int text) {
 		Context context = getApplicationContext();
 		int duration = Toast.LENGTH_SHORT;
@@ -184,10 +173,10 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		public SectionsPagerAdapter(FragmentManager fm) {
 			super(fm);
 		}
-		
+
 		@Override
 		public int getItemPosition(Object object) {
-		    return POSITION_NONE;
+			return POSITION_NONE;
 		}
 
 		@Override
@@ -228,9 +217,9 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 		 * fragment.
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
-		
-		private ArrayAdapter<String> listAdapter;  
-		
+
+		private ArrayAdapter<String> listAdapter;
+
 		public SectionFragment() {
 		}
 
@@ -239,19 +228,21 @@ public class MainActivity extends FragmentActivity implements LoginDialogListene
 				Bundle savedInstanceState) {
 			View rootView = inflater.inflate(R.layout.fragment_main_dummy,
 					container, false);
-			
+
 			if (MainActivity.getUserName() == null) {
 				DialogFragment dialog = new LoginDialogFragment();
-				
-		        dialog.show(getFragmentManager(), "LoginDialogFragment");
-				
+
+				dialog.show(getFragmentManager(), "LoginDialogFragment");
+
 			} else {
-				ListView listView = (ListView) rootView.findViewById(R.id.allPackages);
+				ListView listView = (ListView) rootView
+						.findViewById(R.id.allPackages);
 				listView.setVisibility(View.VISIBLE);
-				
+
 				try {
-					// Set the ArrayAdapter as the ListView's adapter.  
-				    listView.setAdapter(new PackageListAdapter(getActivity(), new RequestTask().getPackages()));  
+					// Set the ArrayAdapter as the ListView's adapter.
+					listView.setAdapter(new PackageListAdapter(getActivity(),
+							new RequestTask().getPackages()));
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
