@@ -2,6 +2,8 @@ package com.cs411.packman;
 
 import org.json.JSONArray;
 
+import com.example.packman.R;
+
 import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
@@ -21,20 +23,18 @@ public class PullPackagesDataService extends Service {
 
     @Override
     public void onCreate() {
-        Toast.makeText(this, "Service created!", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDestroy() {
-        Toast.makeText(this, "Service stopped", Toast.LENGTH_LONG).show();
-        
+        Toast.makeText(this, R.string.polling_disabled, Toast.LENGTH_SHORT).show();
         background.stop();
         background.destroy();
     }
 
     @Override
     public void onStart(Intent intent, int startid) {
-        Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
+        Toast.makeText(this, R.string.polling_enabled, Toast.LENGTH_SHORT).show();
 
         final Messenger messenger = (Messenger) intent.getExtras().get("messenger");
 

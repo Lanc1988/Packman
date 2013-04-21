@@ -11,5 +11,6 @@
     <string name="logout_successful">Logout Successful!</string>
     <string name="data_refresh">Data refreshed!</string>
     <string name="login_successful">Login Successful!</string>
-    <string name="notification">Login Successful!</string>
+    <string name="polling_enabled">Package Polling Enabled</string>
+    <string name="polling_disabled">Package Polling Disabled</string>
 </resources>

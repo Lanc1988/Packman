@@ -19,7 +19,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -83,11 +82,6 @@ public class MainActivity extends FragmentActivity implements
 		super.onPause();
 	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
-
 	public static String getUserName() {
 		return username;
 	}
@@ -123,9 +117,6 @@ public class MainActivity extends FragmentActivity implements
 
 		showToast(R.string.login_successful);
 
-		// Start the background activity;
-//		background.start();
-		
 		Messenger messenger = new Messenger(progressHandler);
 		serviceIntent = new Intent(MainActivity.this, PullPackagesDataService.class);
 		serviceIntent.putExtra("messenger", messenger);
@@ -218,8 +209,6 @@ public class MainActivity extends FragmentActivity implements
 		 */
 		public static final String ARG_SECTION_NUMBER = "section_number";
 
-		private ArrayAdapter<String> listAdapter;
-
 		public SectionFragment() {
 		}
 
@@ -244,7 +233,6 @@ public class MainActivity extends FragmentActivity implements
 					listView.setAdapter(new PackageListAdapter(getActivity(),
 							new RequestTask().getPackages()));
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
