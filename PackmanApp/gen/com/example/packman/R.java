@@ -53,7 +53,10 @@ public final class R {
         public static final int action_refresh=0x7f050001;
         public static final int app_name=0x7f050000;
         public static final int cancel=0x7f050005;
+        public static final int confirm_delete=0x7f05000e;
         public static final int data_refresh=0x7f050009;
+        public static final int delete=0x7f05000d;
+        public static final int delete_confirmation=0x7f05000f;
         public static final int login=0x7f050004;
         public static final int login_successful=0x7f05000a;
         public static final int logout_successful=0x7f050008;

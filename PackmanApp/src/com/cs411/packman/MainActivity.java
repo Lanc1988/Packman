@@ -2,7 +2,11 @@ package com.cs411.packman;
 
 import java.util.Locale;
 
+import org.json.JSONObject;
+
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,6 +23,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -83,12 +88,13 @@ public class MainActivity extends FragmentActivity implements
 		}
 		super.onPause();
 	}
-	
+
 	@Override
 	protected void onResume() {
 		if (username != null) {
 			Messenger messenger = new Messenger(progressHandler);
-			serviceIntent = new Intent(MainActivity.this, PullPackagesDataService.class);
+			serviceIntent = new Intent(MainActivity.this,
+					PullPackagesDataService.class);
 			serviceIntent.putExtra("messenger", messenger);
 			startService(serviceIntent);
 		}
@@ -131,7 +137,8 @@ public class MainActivity extends FragmentActivity implements
 		showToast(R.string.login_successful);
 
 		Messenger messenger = new Messenger(progressHandler);
-		serviceIntent = new Intent(MainActivity.this, PullPackagesDataService.class);
+		serviceIntent = new Intent(MainActivity.this,
+				PullPackagesDataService.class);
 		serviceIntent.putExtra("messenger", messenger);
 		startService(serviceIntent);
 	}
@@ -245,6 +252,47 @@ public class MainActivity extends FragmentActivity implements
 					// Set the ArrayAdapter as the ListView's adapter.
 					listView.setAdapter(new PackageListAdapter(getActivity(),
 							new RequestTask().getPackages()));
+
+					// Set a long click listener to delete items.
+					listView.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+						public boolean onItemLongClick(AdapterView<?> arg0,
+								View v, int index, long arg3) {
+							final JSONObject item = (JSONObject) ((ListView) getActivity()
+									.findViewById(R.id.allPackages))
+									.getItemAtPosition(index);
+
+							AlertDialog.Builder builder = new AlertDialog.Builder(
+									getActivity());
+							builder.setMessage(R.string.confirm_delete)
+									.setCancelable(false)
+									.setPositiveButton(
+											R.string.delete,
+											new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int id) {
+													try {
+														new RequestTask().removePackage((String) item.get("pkgid"));
+														ViewPager viewPager = (ViewPager) getActivity().findViewById(R.id.pager);
+														viewPager.getAdapter().notifyDataSetChanged();
+														((MainActivity) getActivity()).showToast(R.string.delete_confirmation);
+													} catch (Exception e) {
+														e.printStackTrace();
+													}
+												}
+											})
+									.setNegativeButton(
+											R.string.cancel,
+											new DialogInterface.OnClickListener() {
+												public void onClick(DialogInterface dialog, int id) {
+													dialog.cancel();
+												}
+											});
+							AlertDialog alert = builder.create();
+							alert.show();
+
+							return true;
+						}
+					});
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
